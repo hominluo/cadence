@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chatbot UI</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; background: #f0f0f0; }
+    #chat-container { flex: 1; padding: 16px; overflow-y: auto; }
+    .message { margin-bottom: 16px; display: flex; }
+    .message.user { justify-content: flex-end; }
+    .message.user .bubble { background: #1a73e8; color: white; border-radius: 16px 16px 0 16px; padding: 12px; max-width: 80%; }
+    .message.bot { justify-content: flex-start; }
+    .message.bot .bubble { background: white; color: #202124; border-radius: 16px 16px 16px 0; padding: 12px; max-width: 80%; box-shadow: 0 1px 3px rgba(0,0,0,0.1); white-space: pre-wrap; }
+    .event-message { justify-content: flex-start; }
+    .event-card {
+      display: flex; align-items: center; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 8px; margin-bottom: 12px; max-width: 80%;
+    }
+    .event-card img { width: 30px; height: 30px; margin-right: 12px; }
+    .event-details h4 { margin: 0 0 4px; font-size: 1em; color: #202124; }
+    .event-details p { margin: 0; font-size: 0.875em; color: #5f6368; }
+    #chat-form { display: flex; padding: 12px; background: white; }
+    #prompt-input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    #send-button { margin-left: 8px; padding: 10px 20px; border: none; background: #1a73e8; color: white; border-radius: 4px; cursor: pointer; }
+    #send-button:disabled { background: #999; cursor: not-allowed; }
+    ul.suggested-questions li { margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div id="chat-container"></div>
+
+  <form id="chat-form">
+    <input id="prompt-input" type="text" placeholder="Type your message..." autocomplete="off" required />
+    <button id="send-button" type="submit">Send</button>
+  </form>
+
+  <script>
+    const chatContainer = document.getElementById('chat-container');
+    const form = document.getElementById('chat-form');
+    const input = document.getElementById('prompt-input');
+    const sendButton = document.getElementById('send-button');
+
+    function appendBubble(content, sender, isHTML = false) {
+      const msgEl = document.createElement('div');
+      msgEl.classList.add('message', sender);
+      const bubble = document.createElement('div');
+      bubble.classList.add('bubble');
+      if (isHTML) bubble.innerHTML = content;
+      else bubble.textContent = content;
+      msgEl.appendChild(bubble);
+      chatContainer.appendChild(msgEl);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function appendEventCard(cardHTML) {
+      const msgEl = document.createElement('div');
+      msgEl.classList.add('message', 'event-message');
+      msgEl.innerHTML = cardHTML;
+      chatContainer.appendChild(msgEl);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const now = new Date();
+      const meetingTime = new Date(now.getTime() + 60 * 60 * 1000);
+      const timeString = meetingTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const cardHTML = `
+        <div class="event-card">
+          <img src="https://ssl.gstatic.com/calendar/images/dynamiclogo_2020q4/calendar_30_2x.png" alt="Google Calendar"> 
+          <div class="event-details">
+            <h4>Meeting with Jugal Bhatt</h4>
+            <p>${timeString} (in one hour)</p>
+          </div>
+        </div>
+      `;
+      appendEventCard(cardHTML);
+
+      const questionsHTML = `
+        <ul class="suggested-questions" style="margin:0;padding-left:20px;color:#202124;">
+          <li>Can you tell me more about your experience working as a Software Engineer at Verint and FamPay?</li>
+          <li>How did your role as a Graduate Teaching Assistant at the University of Illinois impact your career development?</li>
+          <li>What motivated you to work on projects like the Common Entry Test Portal and the Trademark Perfect platform?</li>
+          <li>How do you approach problem-solving and decision-making in your work?</li>
+          <li>Can you share a challenging situation you faced in your previous roles and how you overcame it?</li>
+          <li>What are your long-term career goals and how do you plan to achieve them?</li>
+          <li>How do you stay updated with the latest trends and technologies in the field of computer science?</li>
+          <li>Can you discuss a project that you are particularly proud of and why?</li>
+          <li>How do you prioritize tasks and manage your time effectively in a fast-paced work environment?</li>
+          <li>What are some of your interests and hobbies outside of work that you are passionate about?</li>
+        </ul>
+      `;
+      appendBubble(`<strong>Suggested Questions:</strong>${questionsHTML}`, 'bot', true);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const prompt = input.value.trim();
+      if (!prompt) return;
+
+      appendBubble(prompt, 'user');
+      input.value = '';
+      sendButton.disabled = true;
+
+      try {
+        const response = await fetch('http://localhost:8001/v2/answer', {
+          method: 'POST',
+          headers: { 'Accept': '*/*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+        const data = await response.json();
+        appendBubble(data.response, 'bot');
+      } catch (err) {
+        appendBubble('Error: ' + err.message, 'bot');
+      } finally {
+        sendButton.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
