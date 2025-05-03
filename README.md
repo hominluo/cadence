@@ -12,7 +12,7 @@ Pedro Ignacio Chiesa - pedroichiesa@gmail.com
 
 Aaron Pickard - pickardaaron@gmail.com
 
-Matt McGoffin - matthew.j.mcgoffin@gmail.com
+Matt McGoffin - matthew.j.mcgoffin@berkeley.edu
 
 Install
 ```bash
