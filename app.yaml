@@ -15,7 +15,7 @@ $sources:
   #   refresh_interval: 30
 
   - !pw.io.gdrive.read
-    object_id: 1ByIXBvTtGPuBkLXRwM12Vdsi7iV18h3H
+    object_id: 1EY4wg0BD-DLxF1i9ATEqd1-WIL_zMrAn
     service_user_credentials_file: credentials.json
     file_name_pattern:
       - "*.pdf"
