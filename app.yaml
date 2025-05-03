@@ -1,0 +1,88 @@
+$sources:
+  # - !pw.io.fs.read
+  #   path: data
+  #   format: binary
+  #   with_metadata: true
+
+  # - !pw.xpacks.connectors.sharepoint.read 
+  #   url: $SHAREPOINT_URL
+  #   tenant: $SHAREPOINT_TENANT
+  #   client_id: $SHAREPOINT_CLIENT_ID
+  #   cert_path: sharepointcert.pem
+  #   thumbprint: $SHAREPOINT_THUMBPRINT
+  #   root_path: $SHAREPOINT_ROOT
+  #   with_metadata: true
+  #   refresh_interval: 30
+
+  - !pw.io.gdrive.read
+    object_id: 1ByIXBvTtGPuBkLXRwM12Vdsi7iV18h3H
+    service_user_credentials_file: credentials.json
+    file_name_pattern:
+      - "*.pdf"
+      - "*.pptx"
+      - "*.txt"
+    object_size_limit: null
+    with_metadata: true
+    refresh_interval: 30
+
+$llm: !pw.xpacks.llm.llms.OpenAIChat
+  model: "gpt-3.5-turbo"
+  retry_strategy: !pw.udfs.ExponentialBackoffRetryStrategy
+  cache_strategy: !pw.udfs.DefaultCache
+  temperature: 0
+  capacity: 8
+
+# $embedder: !pw.xpacks.llm.embedders.OpenAIEmbedder
+#   model: "text-embedding-ada-002"
+#   cache_strategy: !pw.udfs.DefaultCache
+
+$embedding_model: "avsolatorio/GIST-small-Embedding-v0"
+
+$embedder: !pw.xpacks.llm.embedders.SentenceTransformerEmbedder
+  model: $embedding_model
+  call_kwargs: 
+    show_progress_bar: False
+
+$parsing_llm: !pw.xpacks.llm.llms.OpenAIChat
+  model: "gpt-4o"
+  retry_strategy: !pw.udfs.ExponentialBackoffRetryStrategy
+    max_retries: 6
+  cache_strategy: !pw.udfs.DefaultCache
+
+$parser: !pw.xpacks.llm.parsers.UnstructuredParser
+  # multimodal_llm: parsing_llm
+
+$splitter: !pw.xpacks.llm.splitters.TokenCountSplitter
+  max_tokens: 3000
+
+$retriever_factory: !pw.stdlib.indexing.BruteForceKnnFactory
+  reserved_space: 1000
+  embedder: $embedder
+  metric: !pw.engine.BruteForceKnnMetricKind.COS
+  
+$document_store: !pw.xpacks.llm.document_store.DocumentStore
+  docs: $sources
+  parser: $parser
+  splitter: $splitter
+  retriever_factory: $retriever_factory
+
+question_answerer: !pw.xpacks.llm.question_answering.BaseRAGQuestionAnswerer
+  llm: $llm
+  indexer: $document_store
+  # You can set the number of documents to be included as the context of the query
+  # search_topk: 6
+  # You can use your own prompt for querying.
+  # For that set prompt_template to string with `{query}` used as a placeholder for the question,
+  # and `{context}` as a placeholder for context documents.
+  # prompt_template: "Given these documents: {context}, please answer the question: {query}"
+
+# Change host and port by uncommenting these lines
+host: "0.0.0.0"
+port: 8000
+
+# Cache configuration
+# with_cache: true
+
+# If `terminate_on_error` is true then the program will terminate whenever any error is encountered.
+# Defaults to false, uncomment the following line if you want to set it to true
+# terminate_on_error: true
