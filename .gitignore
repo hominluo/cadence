@@ -1,0 +1,42 @@
+# Virtual Environment
+env/
+venv/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment variables
+.env
+
+# Sensitive files
+credentials.json
+
+# Cache folders
+Cache/
+.cache/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo 
