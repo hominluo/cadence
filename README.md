@@ -8,7 +8,7 @@ Ted Shaowang - swjz@uchicago.edu
 
 Mariana Ramirez - mariana.ramirezd97@gmail.com
 
-Pedro Ignacio Ciesa - pedroichiesa@gmail.com
+Pedro Ignacio Chiesa - pedroichiesa@gmail.com
 
 Aaron Pickard - pickardaaron@gmail.com
 
