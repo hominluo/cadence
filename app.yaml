@@ -15,7 +15,7 @@ $sources:
   #   refresh_interval: 30
 
   - !pw.io.gdrive.read
-    object_id: 1KZEY6c4Nh-e012LmIsa9smhB3tw0XkK_
+    object_id: 1Hu15MVEGMG8YoPk_--28zt0BUeoW_9xQatn9b3HeTDY
     service_user_credentials_file: credentials.json
     file_name_pattern:
       - "*.pdf"
@@ -50,7 +50,7 @@ $parsing_llm: !pw.xpacks.llm.llms.OpenAIChat
     max_retries: 6
   cache_strategy: !pw.udfs.DefaultCache
 
-$parser: !pw.xpacks.llm.parsers.Utf8Parser
+$parser: !pw.xpacks.llm.parsers.UnstructuredParser
   # multimodal_llm: parsing_llm
 
 $splitter: !pw.xpacks.llm.splitters.TokenCountSplitter
