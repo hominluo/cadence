@@ -15,7 +15,7 @@ $sources:
   #   refresh_interval: 30
 
   - !pw.io.gdrive.read
-    object_id: 1Hu15MVEGMG8YoPk_--28zt0BUeoW_9xQatn9b3HeTDY
+    object_id: 1ByIXBvTtGPuBkLXRwM12Vdsi7iV18h3H
     service_user_credentials_file: credentials.json
     file_name_pattern:
       - "*.pdf"
@@ -28,7 +28,6 @@ $sources:
 $llm: !pw.xpacks.llm.llms.OpenAIChat
   model: "gpt-3.5-turbo"
   retry_strategy: !pw.udfs.ExponentialBackoffRetryStrategy
-    max_retries: 6
   cache_strategy: !pw.udfs.DefaultCache
   temperature: 0
   capacity: 8
@@ -78,8 +77,8 @@ question_answerer: !pw.xpacks.llm.question_answering.BaseRAGQuestionAnswerer
   # prompt_template: "Given these documents: {context}, please answer the question: {query}"
 
 # Change host and port by uncommenting these lines
-# host: "0.0.0.0"
-# port: 8000
+host: "0.0.0.0"
+port: 8000
 
 # Cache configuration
 # with_cache: true
